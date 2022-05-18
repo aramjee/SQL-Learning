@@ -1,1 +1,38 @@
-# SQL-Learning
+## ![image](https://user-images.githubusercontent.com/26206720/169170252-d34467fe-c19c-47df-9d55-78b6fb53afdb.png) SQL-Learning
+#### LEARNING: My curiosity got me started on experimenting with SQL, specifically postgreSQL.
+
+### PART I:  SQL Query Optimization Learnings
+#### *A Summary of Best Practices from Sisense from* 
+https://www.sisense.com/blog/8-ways-fine-tune-sql-queries-production-databases/
+
+####
+1.	Try to use SELECT on specific columns instead of SELECT * (known as select all)
+
+2.	Avoid SELECT DISTINCT, which can remove duplicates, by selecting more unique columns.  This practice can help decrease processing power
+
+3.	Use INNER JOIN instead of the WHERE clause when joining tables.  Using WHERE to join tables on a common columns performs a Cartesian Product / Cross Join, which can be a costly operation to especially in larger databases.
+
+4.	Avoid using too many JOIN clauses on multiple tables as this can result in costly performance.  Instead try to split lengthy queries up and join them later.
+
+5.	It is more efficient to filter a query based for conditions using a WHERE clause, unless there is a need to filter on an aggregate field, in which case the HAVING clause should be used.  This is in turn due to SQL Order of Operations.
+
+6.	Use EXISTS() instead of COUNT().  EXISTS clause only runs until it locates the records first entry, saving both time and performance issues.
+
+7.	It is more efficient to use wildcard characters at the end of phrases.  Instead of ‘%Char%’ you should use ‘Char%’ , which limits the amount of searching required by the database.
+
+8.	Use LIMIT clause to sample query output if running a query for the first time, especially on a large database.  In this manner, the returns returned can ensure the query was correct or whether it needs editing.   Instead of LIMIT, the FETCH clause can also be used given its standardization from 2008, as not all RDBMS are capable of recognizing LIMIT.
+
+9.	Avoid using multiple OR clauses within 1 given query, as this can lead to poor performance.  Instead split the query into SELECT statements and combine them use the UNION clause
+
+10.	Use an EXPLAIN clause before the query statement to preview the query’s execution plan and estimated costs without having to run the actual query.
+
+11.	Indexes – add indexes to reduce runtime taking in consideration disk space required.  It is just as important to know when to remove unused indexes or not create them.  
+
+12.	Run queries in off-peak hours, especially if they contain the following:
+
+a.	Large Tables
+b.	CROSS JOINS
+c.	Looping statements
+d.	SELECT DISTINCT
+e.	Nested Subqueries
+f.	Wildcard Searches
