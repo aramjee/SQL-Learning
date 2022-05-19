@@ -1,0 +1,200 @@
+-- The following practice exercise were taken from https://www.w3resource.com/sql-exercises/sql-joins-exercises.php
+-- I created tables within postgreSQL, which then allowed me to practice the queries on 3 different tables.  The tables can also be found in the github as CSV files.
+
+
+-- QUERY: Find the salesmen and customers with their name and cities, who belongs to the same city
+-- 1 CORRECT SOLUTION. Find the salesmen and customers with their name and cities, who belongs to the same city
+SELECT salesman.name AS "Salesman", customer.cust_name, customer.city 
+FROM public.salesman, public.customer
+WHERE salesman.city=customer.city;
+
+-- 1 MY RESPONSE: Problem is this table returns the cities associated with the Customer who share the same Sales person, but not necessarily share the same city as sales person
+SELECT salesman.name AS "Salesman", customer.cust_name, customer.city 
+FROM public.salesman, public.customer
+WHERE salesman.salesman_id=customer.salesman_id;
+
+-- QUERY: Write a SQL query to find those orders where order amount exists between 500 and 2000. Return ord_no, purch_amt, cust_name, city
+-- 2. CORRECT SOLUTION: This returns results of customer, city which are associated with the original Order Number
+SELECT orders.ord_no, orders.purch_amt, customer.cust_name, customer.city
+FROM public.orders, public.customer
+WHERE purch_amt BETWEEN 500 AND 2000
+AND orders.customer_id = customer.customer_id;
+
+--2. MY RESPONSE: This returns the right order number and purchase amount, but then returns every customer and their city from the CUSTOMER table instead of the city associated with the original order number
+SELECT orders.ord_no, orders.purch_amt, customer.cust_name, customer.city
+FROM public.orders, public.customer
+WHERE purch_amt BETWEEN 500 AND 2000;
+
+-- QUERY: Write a SQL query to find the salesperson(s) and the customer(s) he handle. Return Customer Name, city, Salesman, commission
+-- 3. CORRECT SOLUTION: Alternative Query
+SELECT cust.cust_name AS "Customer Name", 
+cust.city, b.name AS "Salesman", b.commission 
+FROM public.customer cust 
+INNER JOIN public.salesman b 
+ON cust.salesman_id=b.salesman_id;
+
+-- 3. MY RESPONSE: while correct we should use an inner join as over the Where clause
+SELECT salesman.name AS "Salesman", customer.cust_name, customer.city, salesman.commission
+FROM public.salesman, public.customer
+WHERE salesman.salesman_id=customer.salesman_id;
+
+-- QUERY: Write a SQL query to find those salespersons who received a commission from the company more than 12%. Return Customer Name, customer city, Salesman, commission 
+-- 4. MY RESONSE: returns items where salesman_id is not the same in all tables
+SELECT customer.cust_name, customer.city, salesman.name as "Salesman", salesman.commission
+FROM public.salesman, public.customer
+WHERE salesman.commission > 0.12
+
+-- 4. CORRECT SOLUTION: Returns only where the salesman matches in both tables
+EXPLAIN ANALYZE SELECT customer.cust_name, customer.city, salesman.name as "Salesman", salesman.commission
+FROM public.salesman, public.customer
+WHERE salesman.commission > 0.12
+AND salesman.salesman_id = customer.salesman_id;
+
+-- 4. CORRECT SOLUTION: Using ON clause statement makes reading the Query easier
+EXPLAIN ANALYZE SELECT a.cust_name AS "Customer Name", a.city, b.name AS "Salesman", b.commission 
+FROM public.customer a 
+INNER JOIN public.salesman b 
+ON a.salesman_id=b.salesman_id 
+WHERE b.commission>.12;
+
+-- QUERY:  Write a SQL query to find those salespersons do not live in the same city where their customers live and received a commission from the company more than 12%. 
+--         Return Customer Name, customer city, Salesman, salesman city, commission
+-- 5. MY RESPONSE: Must join tables on a common column, Salesperson ID, in order to compare the Sales person's city with the Customer's city
+SELECT a.cust_name,
+	   a.city AS "Customer City", 
+	   b.name AS "Salesman",
+	   b.city AS "Salesman City",
+	   b.commission AS "Salesman Commission"
+	   FROM public.customer a
+	   INNER JOIN public.salesman b 
+	   ON a.salesman_id=b.salesman_id AND a.city<>b.city 
+	   WHERE b.commission>.12;
+
+-- QUERY:  Write a SQL query to find the details of an order. Return ord_no, ord_date, purch_amt, Customer Name, grade, Salesman, commission.
+-- 6. MY RESPONSE: Had to make sure to join on the corresponding tables which have both customer_ID and salesman_ID
+SELECT o.ord_no, 
+	   o.ord_date,
+	   o.purch_amt, 
+	   c.cust_name,
+	   c.grade,
+	   s.name,
+	   s.commission
+	   FROM public.orders o
+	   INNER JOIN public.customer c 
+	   ON o.customer_id = c.customer_id 
+	   INNER JOIN public.salesman s 
+	   on s.salesman_id = c.salesman_id
+	   ORDER BY purch_amt ASC
+
+-- QUERY: Write a SQL statement to make a join on the tables salesman, customer and orders such that the same column of each table will appear once and 
+-- only the relational rows will come.
+-- 7. CORRECT RESPONSE: NATURAL JOIN - ensures columns with the same name of associated tables will appear once only, no ON claue is needed
+
+SELECT *
+FROM public.orders 
+NATURAL JOIN public.customer  
+NATURAL JOIN public.salesman;
+
+-- QUERY Write an SQL query to display the cust_name, customer city, grade, Salesman, salesman city. The result should be ordered by ascending on customer_id
+-- 8. CORRECT SOLUTION:
+-- While, INNER JOIN and LEFT JOIN returns same results here since all the records of table CUSTOMER has at least one match on table SALESMAN, we should use LEFT JOIN.
+-- But the correct JOIN to use is LEFT JOIN since LEFT JOIN still displays the records on the the LEFT side, CUSTOMER, even if they have no match on the RIGHT side table.
+-- Therefore, INNER JOIN here only works since the table on right, SALESMAN, matches all the the records for salesman_id in table on LEFT in CUSTOMER table
+SELECT c.cust_name,
+	   c.city,
+	   c.grade,
+	   s.name,
+	   s.city,
+	   s.commission
+FROM public.customer c
+LEFT JOIN public.salesman s ON c.salesman_id = s.salesman_id
+ORDER BY customer_id ASC
+
+-- QUERY: Write a SQL query to find those customers whose grade less than 300. Return cust_name, customer city, grade, Salesman, saleman city. Sort ascending by customer ID
+-- 9 MY RESPONSE:
+SELECT c.cust_name,
+	   c.city,
+	   c.grade,
+	   s.name,
+	   s.city
+FROM public.customer c
+LEFT JOIN public.salesman s ON c.salesman_id = s.salesman_id
+WHERE c.grade < 300
+ORDER BY customer_id ASC;
+
+-- QUERY: Write a SQL statement to make a report with customer name, city, order number, order date, and order amount in ascending order 
+-- according to the order date to find that either any of the existing customers have placed no order or placed one or more orders
+-- 10. MY RESPONSE:
+
+SELECT c.cust_name AS "Customer Name",
+       c.city AS "Customer City",
+       o.ord_no AS "Order #", 
+	   o.ord_date AS "Order Date",
+	   o.purch_amt AS "Order Amount"
+	   FROM public.orders o
+	   LEFT JOIN public.customer c
+	   on c.customer_id = o.customer_id
+	   ORDER BY o.ord_date ASC;
+
+-- QUERY.  Write a SQL statement to make a report with customer name, city, order number, order date, order amount salesman name and commission 
+-- to find that either any of the existing customers have placed no order or placed one or more orders by their salesman or by own
+-- 11. MY REPONSE:
+SELECT a.cust_name AS "Customer Name",
+       a.city AS "Customer City", 
+	   b.ord_no AS "Order #",
+	   b.ord_date AS "Order Date",
+	   b.purch_amt AS "Order Amount", 
+       c.name AS "Salesman",
+	   c.commission AS "Sales Commission"
+FROM customer a 
+LEFT JOIN orders b 
+ON a.customer_id=b.customer_id -- First join columns from CUSTOMER table onto ORDER table using Customer ID
+LEFT JOIN salesman c 
+ON c.salesman_id=b.salesman_id; -- Then append the Salesman Name and Commision from SALESMAN table by joining salesman_ID from ORDERS table onto SALES table
+
+-- QUERY. Write a SQL statement to make a list in ascending order for the salesmen who works either for one or more customer or not yet join under any of the customers
+-- MY RESPONSE:
+SELECT c.cust_name,
+	   c.city,
+	   c.grade, 
+       s.name AS "Salesman", 
+	   s.city 
+FROM customer c 
+RIGHT JOIN salesman s 
+ON s.salesman_id=c.salesman_id 
+ORDER BY s.salesman_id;
+
+
+-- QUERY. Write a SQL query to combine each row of salesman table with each row of customer table.
+-- 17 CORRECT SOLUTION: CROSS JOIN returns the cartesian product of rows in a table, but this can affect performance negatively as it's an expensive operation
+SELECT *
+FROM salesman
+CROSS JOIN customer
+
+
+-- QUERY:Write a SQL statement to make a cartesian product between salesman and customer 
+-- 18 CORRECT SOLUTION: i.e. each salesman will appear for all customer and vice versa for that salesman who belongs to a city.
+
+SELECT * 
+FROM salesman s
+CROSS JOIN customer c 
+WHERE s.city IS NOT NULL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
