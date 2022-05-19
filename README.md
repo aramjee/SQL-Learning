@@ -4,7 +4,7 @@
 
 ----
 <h3 align="center">
-    PART I:  SQL Query Optimization Learnings - A Summary of Best Practices
+    PART I:  SQL Query Optimization - A Summary of Best Practices
 </h3>
 
 1.	Try to use **SELECT on specific columns** instead of SELECT * (known as select all)
