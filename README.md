@@ -1,10 +1,11 @@
-# SQL Learning 
+## 🌱 SQL Learning 
 
 *This repository contains my learnings about SQL, Query Optimization, and practice problems I've explored with using PostgreSQL.  Attached, to this repository is my SQL practice queries and take-aways.  Ths file Practice Queries contains queries from [w3resource.com](https://www.w3resource.com/sql-exercises/sql-joins-exercises.php).*
 
-****
-
-PART I: SQL Query Optimization Learnings - A Summary of Best Practices from [Sisense](https://www.sisense.com/blog/8-ways-fine-tune-sql-queries-production-databases/)
+----
+<h3 align="center">
+    PART I:  SQL Query Optimization Learnings - A Summary of Best Practices
+</h3>
 
 1.	Try to use **SELECT on specific columns** instead of SELECT * (known as select all)
 
@@ -35,3 +36,5 @@ PART I: SQL Query Optimization Learnings - A Summary of Best Practices from [Sis
   + SELECT DISTINCT
   + Nested Subqueries
   + Wildcard Searches
+
+#### *Credits/Research Sources: [Sisense](https://www.sisense.com/blog/8-ways-fine-tune-sql-queries-production-databases/), [Tek Tools](https://www.tek-tools.com/systems/sql-query-optimization), [devart](https://blog.devart.com/how-to-optimize-sql-query.html)*
